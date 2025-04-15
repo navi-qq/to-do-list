@@ -7,13 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
+    <ImageView
+        android:id="@+id/addTaskBtn"
+        android:layout_width="102dp"
+        android:layout_height="79dp"
+        android:layout_marginBottom="108dp"
+        app:layout_constraintBottom_toTopOf="@+id/taskContainer"
+        app:layout_constraintEnd_toEndOf="@+id/taskContainer"
+        app:layout_constraintStart_toStartOf="@+id/taskContainer"
+        app:srcCompat="@drawable/plus_icon" />
+
+    <LinearLayout
+        android:id="@+id/taskContainer"
+        android:layout_width="349dp"
+        android:layout_height="356dp"
+        android:layout_marginBottom="92dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
