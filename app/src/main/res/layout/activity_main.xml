@@ -11,20 +11,31 @@
         android:id="@+id/addTaskBtn"
         android:layout_width="102dp"
         android:layout_height="79dp"
-        android:layout_marginBottom="108dp"
-        app:layout_constraintBottom_toTopOf="@+id/taskContainer"
-        app:layout_constraintEnd_toEndOf="@+id/taskContainer"
-        app:layout_constraintStart_toStartOf="@+id/taskContainer"
-        app:srcCompat="@drawable/plus_icon" />
-
-    <LinearLayout
-        android:id="@+id/taskContainer"
-        android:layout_width="349dp"
-        android:layout_height="356dp"
-        android:layout_marginBottom="92dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/scrollViewContainer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.159"
+        app:srcCompat="@drawable/plus_icon" />
+
+    <ScrollView
+        android:id="@+id/scrollViewContainer"
+        android:layout_width="410dp"
+        android:layout_height="448dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addTaskBtn"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/taskContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
