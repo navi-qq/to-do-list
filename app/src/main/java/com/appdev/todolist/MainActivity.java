@@ -42,15 +42,17 @@ public class MainActivity extends AppCompatActivity {
         int editTextDp = 250;
         int iconSize = dpConverter(iconDp);
         int editTextSize = dpConverter(editTextDp);
+        int pencilIconMargin = dpConverter(8);
 
         LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.HORIZONTAL);
-        MarginLayoutParams pencilIconParams = new MarginLayoutParams(iconSize, iconSize);
-        MarginLayoutParams deleteIconParams = new MarginLayoutParams(iconSize,iconSize);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(iconSize, iconSize);
         MarginLayoutParams editTextParams = new MarginLayoutParams(editTextSize, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-        containerParams.gravity = Gravity.CENTER;
+        int centerPosition = Gravity.CENTER;
+        iconParams.gravity = centerPosition;
+        containerParams.gravity = centerPosition;
 
-        pencilIconParams.setMargins(8,0,8,0);
+        iconParams.setMargins(pencilIconMargin,0,pencilIconMargin,0);
 
         ImageView addTaskBtn = findViewById(R.id.addTaskBtn);
         LinearLayout taskContainer = findViewById(R.id.taskContainer);
@@ -73,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
                 editText.setLayoutParams(editTextParams);
 
                 pencilIcon.setImageResource(R.drawable.pencil_icon);
-                pencilIcon.setLayoutParams(pencilIconParams);
+                pencilIcon.setLayoutParams(iconParams);
 
                 deleteIcon.setImageResource(R.drawable.trash_icon);
-                deleteIcon.setLayoutParams(deleteIconParams);
+                deleteIcon.setLayoutParams(iconParams);
 
                 container.addView(checkbox);
                 container.addView(editText);
