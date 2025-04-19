@@ -39,15 +39,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         int iconDp = 22;
-        float pencilIconScale = getResources().getDisplayMetrics().density;
-        int iconSize = (int) (iconDp * pencilIconScale + 0.5f);
+        int editTextDp = 250;
+        int iconSize = dpConverter(iconDp);
+        int editTextSize = dpConverter(editTextDp);
 
-        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.HORIZONTAL);
         MarginLayoutParams pencilIconParams = new MarginLayoutParams(iconSize, iconSize);
-
         MarginLayoutParams deleteIconParams = new MarginLayoutParams(iconSize,iconSize);
+        MarginLayoutParams editTextParams = new MarginLayoutParams(editTextSize, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-        containerParams.gravity = Gravity.CENTER_VERTICAL;
+        containerParams.gravity = Gravity.CENTER;
 
         pencilIconParams.setMargins(8,0,8,0);
 
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 container.setLayoutParams(containerParams);
 
                 editText.setHint("Untitled Task");
+                editText.setLayoutParams(editTextParams);
 
                 pencilIcon.setImageResource(R.drawable.pencil_icon);
                 pencilIcon.setLayoutParams(pencilIconParams);
@@ -85,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
 
+    public int dpConverter(int dps) {
+        float scale = getResources().getDisplayMetrics().density;
+        return (int) (dps * scale + 0.5f);
     }
 }
