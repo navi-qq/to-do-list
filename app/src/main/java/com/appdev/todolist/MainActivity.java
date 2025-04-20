@@ -1,11 +1,15 @@
 package com.appdev.todolist;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,6 +56,34 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        Dialog formDialog = new Dialog(MainActivity.this);
+        formDialog.setContentView(R.layout.form_dialog);
+        formDialog.setCancelable(false);
+
+        formDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button addBtnDialog = formDialog.findViewById(R.id.addBtnDialog);
+        Button cancelBtnDialog = formDialog.findViewById(R.id.cancelBtnDialog);
+        EditText inputFieldDialog = formDialog.findViewById(R.id.inputFieldDialog);
+
+
+        addBtnDialog.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tasks.add(inputFieldDialog.getText().toString());
+                inputFieldDialog.setText("");
+                render();
+                formDialog.dismiss();
+            }
+        });
+
+        cancelBtnDialog.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                formDialog.dismiss();
+            }
+        });
+
         addTaskBtn = findViewById(R.id.addTaskBtn);
         taskContainer = findViewById(R.id.taskContainer);
 
@@ -70,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         addTaskBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                render();
+                formDialog.show();
             }
         });
     }

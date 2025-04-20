@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#00FFFFFF"
+    android:outlineAmbientShadowColor="#1D1D1D"
+    android:outlineSpotShadowColor="#3C3B3B">
+
+
+    <LinearLayout
+        android:layout_width="297dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_form_dialog"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:paddingStart="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintCircleRadius="10dp"
+        tools:layout_editor_absoluteX="-4dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/comfortaa_bold"
+            android:text="ADD A TASK"
+            android:textAlignment="textStart"
+            android:textColor="#2E2D2D"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/inputFieldDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:backgroundTint="#121212"
+            android:drawableTint="#61D128"
+            android:ems="10"
+            android:fontFamily="@font/comfortaa_bold"
+            android:hint="Enter Task"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:textColorHint="#AD8C8B8B"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/addBtnDialog"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:layout_width="12dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetLeft="10dp"
+                android:insetRight="10dp"
+                android:text="ADD"
+                android:textColor="#2AD03D"
+                android:textSize="12sp"
+                app:strokeColor="#26AB2E" />
+
+            <Button
+                android:id="@+id/cancelBtnDialog"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:layout_width="6dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/comfortaa_bold"
+                android:padding="2dp"
+                android:text="cancel"
+                android:textAllCaps="true"
+                android:textColor="#E60C0C"
+                android:textSize="10sp"
+                app:strokeColor="#DB0F0F" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
