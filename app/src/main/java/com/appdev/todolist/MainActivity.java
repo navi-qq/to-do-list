@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<String> tasks = new ArrayList<>();
     TaskStatusHandler taskStatusHandler;
+    RemoveTaskHandler removeTaskHandler;
     ImageView addTaskBtn;
     LinearLayout taskContainer;
     LinearLayout container;
@@ -93,7 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
         addTaskBtn = findViewById(R.id.addTaskBtn);
         taskContainer = findViewById(R.id.taskContainer);
+
         taskStatusHandler = new TaskStatusHandler(taskContainer);
+        removeTaskHandler = new RemoveTaskHandler();
 
         iconSize = dpConverter(22);
         editTextSize = dpConverter(250);
@@ -147,11 +150,13 @@ public class MainActivity extends AppCompatActivity {
             container.addView(deleteIcon);
 
             checkbox.setOnCheckedChangeListener(taskStatusHandler);
+            deleteIcon.setOnClickListener(removeTaskHandler);
+
             taskContainer.addView(container);
         });
     }
 
-    class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
+     class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
 
         final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
         LinearLayout taskContainer;
@@ -181,5 +186,14 @@ public class MainActivity extends AppCompatActivity {
             text.setTextColor(Color.BLACK);
         }
 
+    }
+    class RemoveTaskHandler implements OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            int parentId = ((View) v.getParent()).getId();
+            tasks.remove(parentId);
+            render();
+        }
     }
 }
