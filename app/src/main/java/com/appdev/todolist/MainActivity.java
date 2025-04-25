@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         addTaskBtn = findViewById(R.id.addTaskBtn);
         taskContainer = findViewById(R.id.taskContainer);
 
-        taskStatusHandler = new TaskStatusHandler(taskContainer);
+        taskStatusHandler = new TaskStatusHandler();
         removeTaskHandler = new RemoveTaskHandler();
 
         iconSize = dpConverter(22);
@@ -159,17 +158,10 @@ public class MainActivity extends AppCompatActivity {
      class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
 
         final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
-        LinearLayout taskContainer;
-
-        TaskStatusHandler(LinearLayout taskContainer) {
-            this.taskContainer = taskContainer;
-        }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int parentId = ((View) buttonView.getParent()).getId();
-
-            Log.i("CHECKBOX", "checkBox ID: " + parentId);
             ViewGroup taskSelected = (ViewGroup) taskContainer.getChildAt(parentId);
             EditText text = (EditText) taskSelected.getChildAt(1);
 
