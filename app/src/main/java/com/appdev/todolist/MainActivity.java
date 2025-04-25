@@ -4,6 +4,10 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.style.StrikethroughSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -11,10 +15,12 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +34,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     List<String> tasks = new ArrayList<>();
+    TaskStatusHandler taskStatusHandler;
     ImageView addTaskBtn;
     LinearLayout taskContainer;
     LinearLayout container;
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         addTaskBtn = findViewById(R.id.addTaskBtn);
         taskContainer = findViewById(R.id.taskContainer);
+        taskStatusHandler = new TaskStatusHandler(taskContainer);
 
         iconSize = dpConverter(22);
         editTextSize = dpConverter(250);
@@ -122,8 +130,9 @@ public class MainActivity extends AppCompatActivity {
             deleteIcon = new ImageView(getApplicationContext());
 
             container.setLayoutParams(containerParams);
+            container.setId(tasks.indexOf(task));
 
-            editText.setText(task);
+            editText.setText(task, TextView.BufferType.SPANNABLE);
             editText.setLayoutParams(editTextParams);
 
             pencilIcon.setImageResource(R.drawable.pencil_icon);
@@ -137,7 +146,40 @@ public class MainActivity extends AppCompatActivity {
             container.addView(pencilIcon);
             container.addView(deleteIcon);
 
+            checkbox.setOnCheckedChangeListener(taskStatusHandler);
             taskContainer.addView(container);
         });
+    }
+
+    class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
+
+        final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
+        LinearLayout taskContainer;
+
+        TaskStatusHandler(LinearLayout taskContainer) {
+            this.taskContainer = taskContainer;
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            int parentId = ((View) buttonView.getParent()).getId();
+
+            Log.i("CHECKBOX", "checkBox ID: " + parentId);
+            ViewGroup taskSelected = (ViewGroup) taskContainer.getChildAt(parentId);
+            EditText text = (EditText) taskSelected.getChildAt(1);
+
+            Spannable spannable = text.getText();
+            int length = text.getText().length();
+
+            if (isChecked) {
+                text.setTextColor(Color.GRAY);
+                spannable.setSpan(STRIKE_THROUGH_SPAN, 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                return;
+            }
+
+            spannable.removeSpan(STRIKE_THROUGH_SPAN);
+            text.setTextColor(Color.BLACK);
+        }
+
     }
 }
