@@ -33,7 +33,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<String> tasks = new ArrayList<>();
+//    List<String> tasks = new ArrayList<>();
+    List<Task> tasks = new ArrayList<>();
     TaskStatusHandler taskStatusHandler;
     RemoveTaskHandler removeTaskHandler;
     EditTaskHandler editTaskHandler;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     TextView editTaskDialogTitle;
     EditText taskDescription;
 
+    Spannable spannable;
     int centerPosition = Gravity.CENTER;
     int iconSize;
     int editTextSize;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     int editedTaskIndex;
     String updatedTaskDescription;
+    final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
 
 
     @Override
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         addBtnDialog.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                tasks.add(inputFieldDialog.getText().toString());
+                tasks.add(new Task(inputFieldDialog.getText().toString(), false, null));
                 inputFieldDialog.setText("");
                 render();
                 formDialog.dismiss();
@@ -138,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 updatedTaskDescription = taskDescription.getText().toString();
-                tasks.set(editedTaskIndex, updatedTaskDescription);
+                tasks.get(editedTaskIndex).setNewTaskDescription(updatedTaskDescription);
                 render();
                 editTaskDialog.dismiss();
             }
@@ -162,8 +165,17 @@ public class MainActivity extends AppCompatActivity {
             container.setLayoutParams(containerParams);
             container.setId(tasks.indexOf(task));
 
-            editText.setText(task, TextView.BufferType.SPANNABLE);
+            checkbox.setChecked(task.taskStatus);
+
+            editText.setText(task.taskDescription, TextView.BufferType.SPANNABLE);
             editText.setLayoutParams(editTextParams);
+            editText.setFocusable(false);
+            editText.setClickable(false);
+            if (task.taskStatus) {
+                spannable = editText.getText();
+                editText.setTextColor(Color.GRAY);
+                spannable.setSpan(STRIKE_THROUGH_SPAN, 0, task.taskDescription.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
 
             editButton.setBackgroundResource(R.drawable.pencil_icon);
             editButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -187,23 +199,23 @@ public class MainActivity extends AppCompatActivity {
 
      class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
 
-        final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
-
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int parentId = ((View) buttonView.getParent()).getId();
             ViewGroup taskSelected = (ViewGroup) taskContainer.getChildAt(parentId);
             EditText text = (EditText) taskSelected.getChildAt(1);
 
-            Spannable spannable = text.getText();
+            spannable = text.getText();
             int length = text.getText().length();
 
             if (isChecked) {
+                tasks.get(parentId).setTaskStatus(isChecked);
                 text.setTextColor(Color.GRAY);
                 spannable.setSpan(STRIKE_THROUGH_SPAN, 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 return;
             }
 
+            tasks.get(parentId).setTaskStatus(isChecked);
             spannable.removeSpan(STRIKE_THROUGH_SPAN);
             text.setTextColor(Color.BLACK);
         }
@@ -226,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             int parentId = ((View) v.getParent()).getId();
             editTaskDialogTitle.setText(String.format("Task %s", parentId + 1));
-            taskDescription.setText(tasks.get(parentId));
+            taskDescription.setText(tasks.get(parentId).taskDescription);
             editedTaskIndex = parentId;
             editTaskDialog.show();
         }
