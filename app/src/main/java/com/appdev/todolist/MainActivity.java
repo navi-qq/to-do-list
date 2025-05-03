@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -35,21 +36,30 @@ public class MainActivity extends AppCompatActivity {
     List<String> tasks = new ArrayList<>();
     TaskStatusHandler taskStatusHandler;
     RemoveTaskHandler removeTaskHandler;
+    EditTaskHandler editTaskHandler;
     ImageView addTaskBtn;
     LinearLayout taskContainer;
     LinearLayout container;
     CheckBox checkbox;
     EditText editText;
-    ImageView pencilIcon;
-    ImageView deleteIcon;
+    ImageButton pencilIcon;
+    ImageButton deleteIcon;
     LayoutParams containerParams;
     LayoutParams iconParams;
     MarginLayoutParams editTextParams;
+
+    Dialog editTaskDialog;
+    Button saveTaskButton;
+    TextView editTaskDialogTitle;
+    EditText taskDescription;
 
     int centerPosition = Gravity.CENTER;
     int iconSize;
     int editTextSize;
     int pencilIconMargin;
+
+    int editedTaskIndex;
+    String updatedTaskDescription;
 
 
     @Override
@@ -66,13 +76,23 @@ public class MainActivity extends AppCompatActivity {
         Dialog formDialog = new Dialog(MainActivity.this);
         formDialog.setContentView(R.layout.form_dialog);
         formDialog.setCancelable(false);
-
         formDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+
+        editTaskDialog = new Dialog(MainActivity.this);
+        editTaskDialog.setContentView(R.layout.edit_task_dialog);
+        editTaskDialog.setCancelable(false);
+        editTaskDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
         Button addBtnDialog = formDialog.findViewById(R.id.addBtnDialog);
-        Button cancelBtnDialog = formDialog.findViewById(R.id.cancelBtnDialog);
+        Button cancelBtnDialog = formDialog.findViewById(R.id.cancelTaskButton);
         EditText inputFieldDialog = formDialog.findViewById(R.id.inputFieldDialog);
 
+        saveTaskButton = editTaskDialog.findViewById(R.id.saveTaskButton);
+        Button cancelTaskButton = editTaskDialog.findViewById(R.id.cancelTaskButton);
+        editTaskDialogTitle = editTaskDialog.findViewById(R.id.editTaskDialogTitle);
+        taskDescription = editTaskDialog.findViewById(R.id.taskDescription);
 
         addBtnDialog.setOnClickListener(new OnClickListener() {
             @Override
@@ -84,18 +104,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        cancelBtnDialog.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                formDialog.dismiss();
-            }
-        });
+        cancelBtnDialog.setOnClickListener(v -> formDialog.dismiss());
+        cancelTaskButton.setOnClickListener(v -> editTaskDialog.dismiss());
 
         addTaskBtn = findViewById(R.id.addTaskBtn);
         taskContainer = findViewById(R.id.taskContainer);
 
         taskStatusHandler = new TaskStatusHandler();
         removeTaskHandler = new RemoveTaskHandler();
+        editTaskHandler = new EditTaskHandler();
 
         iconSize = dpConverter(22);
         editTextSize = dpConverter(250);
@@ -115,6 +132,17 @@ public class MainActivity extends AppCompatActivity {
                 formDialog.show();
             }
         });
+
+        saveTaskButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                updatedTaskDescription = taskDescription.getText().toString();
+                tasks.set(editedTaskIndex, updatedTaskDescription);
+                render();
+                editTaskDialog.dismiss();
+            }
+        });
     }
 
     public int dpConverter(int dps) {
@@ -128,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
             container = new LinearLayout(getApplicationContext());
             checkbox = new CheckBox(getApplicationContext());
             editText = new EditText(getApplicationContext());
-            pencilIcon = new ImageView(getApplicationContext());
-            deleteIcon = new ImageView(getApplicationContext());
+            pencilIcon = new ImageButton(getApplicationContext());
+            deleteIcon = new ImageButton(getApplicationContext());
 
             container.setLayoutParams(containerParams);
             container.setId(tasks.indexOf(task));
@@ -137,10 +165,11 @@ public class MainActivity extends AppCompatActivity {
             editText.setText(task, TextView.BufferType.SPANNABLE);
             editText.setLayoutParams(editTextParams);
 
-            pencilIcon.setImageResource(R.drawable.pencil_icon);
+            pencilIcon.setBackgroundResource(R.drawable.pencil_icon);
+            pencilIcon.setScaleType(ImageView.ScaleType.CENTER);
             pencilIcon.setLayoutParams(iconParams);
 
-            deleteIcon.setImageResource(R.drawable.trash_icon);
+            deleteIcon.setBackgroundResource(R.drawable.trash_icon);
             deleteIcon.setLayoutParams(iconParams);
 
             container.addView(checkbox);
@@ -150,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
             checkbox.setOnCheckedChangeListener(taskStatusHandler);
             deleteIcon.setOnClickListener(removeTaskHandler);
+            pencilIcon.setOnClickListener(editTaskHandler);
 
             taskContainer.addView(container);
         });
@@ -186,6 +216,19 @@ public class MainActivity extends AppCompatActivity {
             int parentId = ((View) v.getParent()).getId();
             tasks.remove(parentId);
             render();
+        }
+    }
+
+
+    class EditTaskHandler implements OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            int parentId = ((View) v.getParent()).getId();
+            editTaskDialogTitle.setText(String.format("Task %s", parentId + 1));
+            taskDescription.setText(tasks.get(parentId));
+            editedTaskIndex = parentId;
+            editTaskDialog.show();
         }
     }
 }
