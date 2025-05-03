@@ -71,7 +71,7 @@
                 app:strokeColor="#26AB2E" />
 
             <Button
-                android:id="@+id/cancelBtnDialog"
+                android:id="@+id/cancelTaskButton"
                 style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="6dp"
                 android:layout_height="wrap_content"
