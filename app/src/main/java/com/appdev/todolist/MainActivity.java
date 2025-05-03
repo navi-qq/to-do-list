@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout container;
     CheckBox checkbox;
     EditText editText;
-    ImageButton pencilIcon;
-    ImageButton deleteIcon;
+    ImageButton editButton;
+    ImageButton deleteButton;
     LayoutParams containerParams;
     LayoutParams iconParams;
     MarginLayoutParams editTextParams;
@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
             container = new LinearLayout(getApplicationContext());
             checkbox = new CheckBox(getApplicationContext());
             editText = new EditText(getApplicationContext());
-            pencilIcon = new ImageButton(getApplicationContext());
-            deleteIcon = new ImageButton(getApplicationContext());
+            editButton = new ImageButton(getApplicationContext());
+            deleteButton = new ImageButton(getApplicationContext());
 
             container.setLayoutParams(containerParams);
             container.setId(tasks.indexOf(task));
@@ -165,21 +165,21 @@ public class MainActivity extends AppCompatActivity {
             editText.setText(task, TextView.BufferType.SPANNABLE);
             editText.setLayoutParams(editTextParams);
 
-            pencilIcon.setBackgroundResource(R.drawable.pencil_icon);
-            pencilIcon.setScaleType(ImageView.ScaleType.CENTER);
-            pencilIcon.setLayoutParams(iconParams);
+            editButton.setBackgroundResource(R.drawable.pencil_icon);
+            editButton.setScaleType(ImageView.ScaleType.CENTER);
+            editButton.setLayoutParams(iconParams);
 
-            deleteIcon.setBackgroundResource(R.drawable.trash_icon);
-            deleteIcon.setLayoutParams(iconParams);
+            deleteButton.setBackgroundResource(R.drawable.trash_icon);
+            deleteButton.setLayoutParams(iconParams);
 
             container.addView(checkbox);
             container.addView(editText);
-            container.addView(pencilIcon);
-            container.addView(deleteIcon);
+            container.addView(editButton);
+            container.addView(deleteButton);
 
             checkbox.setOnCheckedChangeListener(taskStatusHandler);
-            deleteIcon.setOnClickListener(removeTaskHandler);
-            pencilIcon.setOnClickListener(editTaskHandler);
+            deleteButton.setOnClickListener(removeTaskHandler);
+            editButton.setOnClickListener(editTaskHandler);
 
             taskContainer.addView(container);
         });
