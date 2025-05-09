@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     RemoveTaskHandler removeTaskHandler;
     EditTaskHandler editTaskHandler;
     ImageView addTaskBtn;
-    LinearLayout taskContainer;
+    LinearLayout taskContainerFirst;
+    LinearLayout taskContainerSecond;
     LinearLayout container;
     CheckBox checkbox;
     EditText editText;
@@ -110,8 +112,27 @@ public class MainActivity extends AppCompatActivity {
         cancelBtnDialog.setOnClickListener(v -> formDialog.dismiss());
         cancelTaskButton.setOnClickListener(v -> editTaskDialog.dismiss());
 
-        addTaskBtn = findViewById(R.id.addTaskBtn);
-        taskContainer = findViewById(R.id.taskContainer);
+        addTaskBtn = findViewById(R.id.addTaskButton);
+
+        ScrollView taskFirstScrollViewContainer = findViewById(R.id.taskFirstScrollViewContainer);
+        ScrollView taskSecondScrollViewContainer = findViewById(R.id.taskSecondScrollViewContainer);
+
+        LinearLayout collapseTitleFirst = findViewById(R.id.collapseTitleFirst);
+        LinearLayout collapseTitleSecond = findViewById(R.id.collapseTitleSecond);
+
+        ImageView collapseArrowIconFirst = findViewById(R.id.collapseArrowIconFirst);
+        ImageView collapseArrowIconSecond = findViewById(R.id.collapseArrowIconSecond);
+
+        taskContainerFirst = findViewById(R.id.taskContainerFirst);
+        taskContainerSecond = findViewById(R.id.taskContainerSecond);
+
+        CollapseListHandler collapseListHandlerFirst = new CollapseListHandler(taskFirstScrollViewContainer,
+                                                                                collapseArrowIconFirst);
+
+        CollapseListHandler collapseListHandlerSecond = new CollapseListHandler(taskSecondScrollViewContainer,
+                                                                                collapseArrowIconSecond);
+
+
 
         taskStatusHandler = new TaskStatusHandler();
         removeTaskHandler = new RemoveTaskHandler();
@@ -146,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
                 editTaskDialog.dismiss();
             }
         });
+
+        collapseTitleFirst.setOnClickListener(collapseListHandlerFirst);
+        collapseTitleSecond.setOnClickListener(collapseListHandlerSecond);
     }
 
     public int dpConverter(int dps) {
@@ -154,7 +178,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void render() {
-        taskContainer.removeAllViews();
+        taskContainerFirst.removeAllViews();
+        taskContainerSecond.removeAllViews();
         tasks.forEach(task -> {
             container = new LinearLayout(getApplicationContext());
             checkbox = new CheckBox(getApplicationContext());
@@ -171,11 +196,6 @@ public class MainActivity extends AppCompatActivity {
             editText.setLayoutParams(editTextParams);
             editText.setFocusable(false);
             editText.setClickable(false);
-            if (task.taskStatus) {
-                spannable = editText.getText();
-                editText.setTextColor(Color.GRAY);
-                spannable.setSpan(STRIKE_THROUGH_SPAN, 0, task.taskDescription.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
 
             editButton.setBackgroundResource(R.drawable.pencil_icon);
             editButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -193,7 +213,15 @@ public class MainActivity extends AppCompatActivity {
             deleteButton.setOnClickListener(removeTaskHandler);
             editButton.setOnClickListener(editTaskHandler);
 
-            taskContainer.addView(container);
+            if (task.taskStatus) {
+                spannable = editText.getText();
+                editText.setTextColor(Color.GRAY);
+                spannable.setSpan(STRIKE_THROUGH_SPAN, 0, task.taskDescription.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                taskContainerSecond.addView(container);
+                return;
+            }
+
+            taskContainerFirst.addView(container);
         });
     }
 
@@ -202,22 +230,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int parentId = ((View) buttonView.getParent()).getId();
-            ViewGroup taskSelected = (ViewGroup) taskContainer.getChildAt(parentId);
-            EditText text = (EditText) taskSelected.getChildAt(1);
-
-            spannable = text.getText();
-            int length = text.getText().length();
-
+            
             if (isChecked) {
                 tasks.get(parentId).setTaskStatus(isChecked);
-                text.setTextColor(Color.GRAY);
-                spannable.setSpan(STRIKE_THROUGH_SPAN, 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                render();
                 return;
             }
 
             tasks.get(parentId).setTaskStatus(isChecked);
-            spannable.removeSpan(STRIKE_THROUGH_SPAN);
-            text.setTextColor(Color.BLACK);
+            render();
         }
 
     }
@@ -241,6 +262,31 @@ public class MainActivity extends AppCompatActivity {
             taskDescription.setText(tasks.get(parentId).taskDescription);
             editedTaskIndex = parentId;
             editTaskDialog.show();
+        }
+    }
+
+    class CollapseListHandler implements OnClickListener {
+
+        ScrollView scrollViewContainer;
+        ImageView icon;
+
+        CollapseListHandler(ScrollView scrollViewContainer,
+                            ImageView icon) {
+            this.scrollViewContainer = scrollViewContainer;
+            this.icon = icon;
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            if (scrollViewContainer.getVisibility() == View.VISIBLE) {
+                scrollViewContainer.setVisibility(View.INVISIBLE);
+                icon.setRotation(0);
+                return;
+            }
+
+            scrollViewContainer.setVisibility(View.VISIBLE);
+            icon.setRotation(-270);
         }
     }
 }
