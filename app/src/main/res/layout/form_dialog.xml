@@ -5,8 +5,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="#00FFFFFF"
+    android:backgroundTint="#211717"
     android:outlineAmbientShadowColor="#1D1D1D"
-    android:outlineSpotShadowColor="#3C3B3B">
+    android:outlineSpotShadowColor="#7A6060">
 
 
     <LinearLayout
@@ -59,14 +60,15 @@
 
             <Button
                 android:id="@+id/addBtnDialog"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="12dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:backgroundTint="#BD9292"
                 android:insetLeft="10dp"
                 android:insetRight="10dp"
                 android:text="ADD"
-                android:textColor="#2AD03D"
+                android:textColor="#FDFBFB"
                 android:textSize="12sp"
                 app:strokeColor="#26AB2E" />
 
@@ -80,9 +82,9 @@
                 android:padding="2dp"
                 android:text="cancel"
                 android:textAllCaps="true"
-                android:textColor="#E60C0C"
+                android:textColor="#817575"
                 android:textSize="10sp"
-                app:strokeColor="#DB0F0F" />
+                app:strokeColor="#BD9292" />
 
         </LinearLayout>
     </LinearLayout>

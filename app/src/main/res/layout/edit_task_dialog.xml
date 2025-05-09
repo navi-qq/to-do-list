@@ -42,17 +42,17 @@
 
             <Button
                 android:id="@+id/saveTaskButton"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="12dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:backgroundTint="#BD9292"
                 android:insetLeft="10dp"
                 android:insetRight="10dp"
                 android:text="save"
                 android:textAllCaps="true"
-                android:textColor="#2AD03D"
-                android:textSize="12sp"
-                app:strokeColor="#2AD03D" />
+                android:textColor="#FDFBFB"
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/cancelTaskButton"
@@ -64,9 +64,9 @@
                 android:padding="2dp"
                 android:text="cancel"
                 android:textAllCaps="true"
-                android:textColor="#E60C0C"
+                android:textColor="#817575"
                 android:textSize="10sp"
-                app:strokeColor="#E60C0C" />
+                app:strokeColor="#BD9292" />
 
         </LinearLayout>
     </LinearLayout>
