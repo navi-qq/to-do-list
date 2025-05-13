@@ -1,6 +1,8 @@
 package com.appdev.todolist;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -29,6 +31,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
 //    List<String> tasks = new ArrayList<>();
     List<Task> tasks = new ArrayList<>();
+    SharedPreferences taskDataPreferences;
+    Gson gson = new Gson();
+    String json;
     TaskStatusHandler taskStatusHandler;
     RemoveTaskHandler removeTaskHandler;
     EditTaskHandler editTaskHandler;
@@ -78,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        taskDataPreferences = getApplicationContext().getSharedPreferences("taskDataPref", MODE_PRIVATE);
+
+        loadTaskData();
+
         Dialog formDialog = new Dialog(MainActivity.this);
         formDialog.setContentView(R.layout.form_dialog);
         formDialog.setCancelable(false);
@@ -104,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 tasks.add(new Task(inputFieldDialog.getText().toString(), false, null));
                 inputFieldDialog.setText("");
+                saveTaskData();
+                loadTaskData();
                 render();
                 formDialog.dismiss();
             }
@@ -113,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         cancelTaskButton.setOnClickListener(v -> editTaskDialog.dismiss());
 
         addTaskBtn = findViewById(R.id.addTaskButton);
+        ImageView taskRecordButton = findViewById(R.id.taskRecordButton);
 
         ScrollView taskFirstScrollViewContainer = findViewById(R.id.taskFirstScrollViewContainer);
         ScrollView taskSecondScrollViewContainer = findViewById(R.id.taskSecondScrollViewContainer);
@@ -163,13 +180,26 @@ public class MainActivity extends AppCompatActivity {
 
                 updatedTaskDescription = taskDescription.getText().toString();
                 tasks.get(editedTaskIndex).setNewTaskDescription(updatedTaskDescription);
+                saveTaskData();
+                loadTaskData();
                 render();
                 editTaskDialog.dismiss();
             }
         });
 
+        taskRecordButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent taskRecords = new Intent(MainActivity.this, TaskRecord.class);
+                MainActivity.this.startActivity(taskRecords);
+            }
+        });
+
         collapseTitleFirst.setOnClickListener(collapseListHandlerFirst);
         collapseTitleSecond.setOnClickListener(collapseListHandlerSecond);
+
+        render();
     }
 
     public int dpConverter(int dps) {
@@ -225,6 +255,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void saveTaskData() {
+        SharedPreferences.Editor taskDataEditor = taskDataPreferences.edit();
+        json = gson.toJson(tasks);
+        taskDataEditor.putString("taskData", json);
+        taskDataEditor.apply();
+
+    }
+
+    public void loadTaskData() {
+        json = taskDataPreferences.getString("taskData", null);
+        Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+        tasks = gson.fromJson(json, listType);
+    }
+
      class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
 
         @Override
@@ -233,11 +277,15 @@ public class MainActivity extends AppCompatActivity {
             
             if (isChecked) {
                 tasks.get(parentId).setTaskStatus(isChecked);
+                saveTaskData();
+                loadTaskData();
                 render();
                 return;
             }
 
             tasks.get(parentId).setTaskStatus(isChecked);
+            saveTaskData();
+            loadTaskData();
             render();
         }
 
@@ -248,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             int parentId = ((View) v.getParent()).getId();
             tasks.remove(parentId);
+            saveTaskData();
+            loadTaskData();
             render();
         }
     }
