@@ -91,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
         taskDataPreferences = getApplicationContext().getSharedPreferences("taskDataPref", MODE_PRIVATE);
 
         loadTaskData();
+        initialize();
+        render();
+    }
 
+    public void initialize() {
         Dialog formDialog = new Dialog(MainActivity.this);
         formDialog.setContentView(R.layout.form_dialog);
         formDialog.setCancelable(false);
@@ -116,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         addBtnDialog.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (inputFieldDialog.getText().toString().isEmpty()) return;
+
                 tasks.add(new Task(inputFieldDialog.getText().toString(), false, null));
                 inputFieldDialog.setText("");
                 saveTaskData();
@@ -144,10 +150,10 @@ public class MainActivity extends AppCompatActivity {
         taskContainerSecond = findViewById(R.id.taskContainerSecond);
 
         CollapseListHandler collapseListHandlerFirst = new CollapseListHandler(taskFirstScrollViewContainer,
-                                                                                collapseArrowIconFirst);
+                collapseArrowIconFirst);
 
         CollapseListHandler collapseListHandlerSecond = new CollapseListHandler(taskSecondScrollViewContainer,
-                                                                                collapseArrowIconSecond);
+                collapseArrowIconSecond);
 
 
 
@@ -198,8 +204,6 @@ public class MainActivity extends AppCompatActivity {
 
         collapseTitleFirst.setOnClickListener(collapseListHandlerFirst);
         collapseTitleSecond.setOnClickListener(collapseListHandlerSecond);
-
-        render();
     }
 
     public int dpConverter(int dps) {
