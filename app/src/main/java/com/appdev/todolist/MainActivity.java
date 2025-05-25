@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,7 +37,13 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 //    List<String> tasks = new ArrayList<>();
     List<Task> tasks = new ArrayList<>();
     SharedPreferences taskDataPreferences;
+    SharedPreferences taskHistoryDataPreferences;
     Gson gson = new Gson();
     String json;
     TaskStatusHandler taskStatusHandler;
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     String updatedTaskDescription;
     final StrikethroughSpan STRIKE_THROUGH_SPAN = new StrikethroughSpan();
 
+    DateFormat df;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +98,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         taskDataPreferences = getApplicationContext().getSharedPreferences("taskDataPref", MODE_PRIVATE);
+        taskHistoryDataPreferences = getApplicationContext().getSharedPreferences("taskHistoryDataPref", MODE_PRIVATE);
 
         loadTaskData();
         initialize();
         render();
+        df = new SimpleDateFormat("h:mm a");
     }
 
     public void initialize() {
@@ -265,6 +276,13 @@ public class MainActivity extends AppCompatActivity {
         taskDataEditor.putString("taskData", json);
         taskDataEditor.apply();
 
+
+        String date = df.format(Calendar.getInstance().getTime());
+        if (date.equals("11:59 PM")) {
+            SharedPreferences.Editor taskHistoryDataEditor = taskHistoryDataPreferences.edit();
+            taskHistoryDataEditor.putString("taskHistoryData", json);
+            taskHistoryDataEditor.apply();
+        }
     }
 
     public void loadTaskData() {
