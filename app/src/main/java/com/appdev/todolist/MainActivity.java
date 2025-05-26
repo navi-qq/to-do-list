@@ -9,11 +9,9 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -32,23 +30,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
 //    List<String> tasks = new ArrayList<>();
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
     List<Task> tasks = new ArrayList<>();
     SharedPreferences taskDataPreferences;
     SharedPreferences taskHistoryDataPreferences;
@@ -135,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
                 tasks.add(new Task(inputFieldDialog.getText().toString(), false, null));
                 inputFieldDialog.setText("");
-                saveTaskData();
+                saveTaskDataToLocal();
+                saveTaskDataToFirebase();
                 loadTaskData();
                 render();
                 formDialog.dismiss();
@@ -197,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
                 updatedTaskDescription = taskDescription.getText().toString();
                 tasks.get(editedTaskIndex).setNewTaskDescription(updatedTaskDescription);
-                saveTaskData();
+                saveTaskDataToLocal();
                 loadTaskData();
                 render();
                 editTaskDialog.dismiss();
@@ -270,7 +268,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void saveTaskData() {
+    public void saveTaskDataToFirebase() {
+        tasks.forEach(task -> {
+            HashMap<String, Object> tempTask = new HashMap<>();
+            tempTask.put("taskDescription", task.taskDescription);
+            if (task.taskStatus) {
+                tempTask.put("taskStatus", "true");
+            } else tempTask.put("taskStatus", "false");
+
+
+            String taskNodeId = Integer.toString(tasks.indexOf(task));
+
+            database.getReference()
+                    .child("Tasks")
+                    .child(taskNodeId).updateChildren(tempTask);
+        });
+    }
+
+    public void saveTaskDataToLocal() {
+
         SharedPreferences.Editor taskDataEditor = taskDataPreferences.edit();
         json = gson.toJson(tasks);
         taskDataEditor.putString("taskData", json);
@@ -293,20 +309,26 @@ public class MainActivity extends AppCompatActivity {
 
      class TaskStatusHandler implements CompoundButton.OnCheckedChangeListener {
 
+         HashMap<String, Object> tempTask = new HashMap<>();
+
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int parentId = ((View) buttonView.getParent()).getId();
             
             if (isChecked) {
                 tasks.get(parentId).setTaskStatus(isChecked);
-                saveTaskData();
+                saveTaskDataToLocal();
+                tempTask.put("taskStatus", Boolean.toString(isChecked));
+                database.getReference().child("Tasks")
+                        .child(Integer.toString(parentId))
+                        .updateChildren(tempTask);
                 loadTaskData();
                 render();
                 return;
             }
 
             tasks.get(parentId).setTaskStatus(isChecked);
-            saveTaskData();
+            saveTaskDataToLocal();
             loadTaskData();
             render();
         }
@@ -318,7 +340,10 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             int parentId = ((View) v.getParent()).getId();
             tasks.remove(parentId);
-            saveTaskData();
+            database.getReference().child("Tasks")
+                    .child(Integer.toString(parentId))
+                    .removeValue();
+            saveTaskDataToLocal();
             loadTaskData();
             render();
         }
@@ -326,11 +351,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     class EditTaskHandler implements OnClickListener {
+        HashMap<String, Object> tempTask = new HashMap<>();
 
         @Override
         public void onClick(View v) {
             int parentId = ((View) v.getParent()).getId();
             editTaskDialogTitle.setText(String.format("Task %s", parentId + 1));
+            tempTask.put("taskDescription", tasks.get(parentId).taskDescription);
+            database.getReference().child("Tasks")
+                    .child(Integer.toString(parentId))
+                    .updateChildren(tempTask);
             taskDescription.setText(tasks.get(parentId).taskDescription);
             editedTaskIndex = parentId;
             editTaskDialog.show();
