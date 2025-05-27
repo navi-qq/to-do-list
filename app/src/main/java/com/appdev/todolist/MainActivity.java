@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -21,16 +22,21 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -47,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 //    List<String> tasks = new ArrayList<>();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     List<Task> tasks = new ArrayList<>();
+    ArrayList<String> capturedList;
     SharedPreferences taskDataPreferences;
     SharedPreferences taskHistoryDataPreferences;
     Gson gson = new Gson();
@@ -100,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         loadTaskData();
         initialize();
         render();
-        df = new SimpleDateFormat("h:mm a");
     }
 
     public void initialize() {
@@ -190,11 +196,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         saveTaskButton.setOnClickListener(new OnClickListener() {
+
+            HashMap<String, Object> tempTask = new HashMap<>();
             @Override
             public void onClick(View v) {
 
                 updatedTaskDescription = taskDescription.getText().toString();
                 tasks.get(editedTaskIndex).setNewTaskDescription(updatedTaskDescription);
+                tempTask.put("taskDescription", tasks.get(editedTaskIndex).taskDescription);
+                database.getReference().child("Tasks")
+                        .child(Integer.toString(editedTaskIndex))
+                        .updateChildren(tempTask);
                 saveTaskDataToLocal();
                 loadTaskData();
                 render();
@@ -269,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void saveTaskDataToFirebase() {
+
         tasks.forEach(task -> {
             HashMap<String, Object> tempTask = new HashMap<>();
             tempTask.put("taskDescription", task.taskDescription);
@@ -292,13 +305,6 @@ public class MainActivity extends AppCompatActivity {
         taskDataEditor.putString("taskData", json);
         taskDataEditor.apply();
 
-
-        String date = df.format(Calendar.getInstance().getTime());
-        if (date.equals("11:59 PM")) {
-            SharedPreferences.Editor taskHistoryDataEditor = taskHistoryDataPreferences.edit();
-            taskHistoryDataEditor.putString("taskHistoryData", json);
-            taskHistoryDataEditor.apply();
-        }
     }
 
     public void loadTaskData() {
@@ -314,21 +320,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             int parentId = ((View) buttonView.getParent()).getId();
-            
-            if (isChecked) {
-                tasks.get(parentId).setTaskStatus(isChecked);
-                saveTaskDataToLocal();
-                tempTask.put("taskStatus", Boolean.toString(isChecked));
-                database.getReference().child("Tasks")
-                        .child(Integer.toString(parentId))
-                        .updateChildren(tempTask);
-                loadTaskData();
-                render();
-                return;
-            }
 
             tasks.get(parentId).setTaskStatus(isChecked);
             saveTaskDataToLocal();
+            tempTask.put("taskStatus", Boolean.toString(isChecked));
+            database.getReference().child("Tasks")
+                    .child(Integer.toString(parentId))
+                    .updateChildren(tempTask);
             loadTaskData();
             render();
         }
@@ -351,16 +349,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     class EditTaskHandler implements OnClickListener {
-        HashMap<String, Object> tempTask = new HashMap<>();
+
 
         @Override
         public void onClick(View v) {
             int parentId = ((View) v.getParent()).getId();
             editTaskDialogTitle.setText(String.format("Task %s", parentId + 1));
-            tempTask.put("taskDescription", tasks.get(parentId).taskDescription);
-            database.getReference().child("Tasks")
-                    .child(Integer.toString(parentId))
-                    .updateChildren(tempTask);
             taskDescription.setText(tasks.get(parentId).taskDescription);
             editedTaskIndex = parentId;
             editTaskDialog.show();
